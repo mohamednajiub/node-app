@@ -3,11 +3,20 @@ const bodyParser = require("body-parser");
 
 const path = require("path");
 
+const expressHBS = require("express-handlebars");
+
 const adminData = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
 const app = express();
-app.set("view engine", "pug");
+
+var handlebars = expressHBS.create({
+  extname: ".hbs",
+  // helpers: handlebarsHelpers,
+});
+app.engine(".hbs", handlebars.engine);
+app.set("view engine", ".hbs");
+
 app.set("views", "views");
 
 app.use(bodyParser.urlencoded({ extended: false }));
