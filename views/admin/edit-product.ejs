@@ -30,12 +30,17 @@
                             rows="5"><% if (editing && product) { %><%=product.description%><% } %></textarea>
                     </div>
 
-                    <button class="btn" type="submit">
-                        <% if (editing) { %>
-                            Update Product
-                            <% } else { %> Add Product
-                                <% } %>
-                    </button>
+                    <% if (editing && product) { %>
+                        <input type="hidden" name="id" value="<%= product.id%>">
+
+                        <% } %>
+
+                            <button class="btn" type="submit">
+                                <% if (editing) { %>
+                                    Update Product
+                                    <% } else { %> Add Product
+                                        <% } %>
+                            </button>
                 </form>
             </main>
             <%- include('../includes/end.ejs') %>
