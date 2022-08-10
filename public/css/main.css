@@ -162,6 +162,7 @@ form {
 }
 
 .card__image img {
+  display: block;
   width: 100%;
 }
 
