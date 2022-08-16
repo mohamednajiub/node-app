@@ -143,11 +143,10 @@ class User {
     getOrders() {
         const db = getDB();
         return db.collection('orders')
-            .find()
-            .then(result => {
-                this.cart = { items: [] }
+            .find({
+                "user._id": new ObjectId(this._id)
+            }).toArray()
 
-            })
     }
 
 }
