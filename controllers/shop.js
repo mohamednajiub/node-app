@@ -130,7 +130,7 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch(error => {
-      console.log(errors)
+      console.log(error)
     })
 };
 
@@ -142,7 +142,6 @@ exports.postOrder = (req, res, next) => {
       fetchedCart = cart;
       return cart.getProducts()
     }).then(products => {
-      console.log(products)
       return req.user.createOrder()
         .then(order => {
           return order.addProducts(products.map(product => {
@@ -152,7 +151,7 @@ exports.postOrder = (req, res, next) => {
             return product
           }))
         }).catch(error => {
-          console.log(errors)
+          console.log(error)
         })
     }).then(result => {
       return fetchedCart.setProducts(null)
@@ -160,6 +159,6 @@ exports.postOrder = (req, res, next) => {
       res.redirect('/orders')
     })
     .catch(error => {
-      console.log(errors)
+      console.log(error)
     })
 };

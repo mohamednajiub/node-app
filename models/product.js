@@ -3,12 +3,13 @@ const { getDB } = require('../util/database')
 
 class Product {
 
-  constructor(title, price, description, imageUrl, id) {
+  constructor(title, price, description, imageUrl, id, userId) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
     this._id = id ? new ObjectId(id) : null;
+    this.userId = userId;
   }
 
   save() {
@@ -26,7 +27,6 @@ class Product {
     }
 
     return dpOp.then((result) => {
-      console.log(result)
       return result
     }).catch(error => {
       console.log(error)
@@ -51,7 +51,6 @@ class Product {
       .find({ _id: new ObjectId(productId) })
       .next()
       .then(product => {
-        console.log(product)
         return product
       }).catch(error => {
         console.log(error)
@@ -62,7 +61,6 @@ class Product {
     const db = getDB();
     return db.collection('products').deleteOne({ _id: new ObjectId(productId) })
       .then(result => {
-        console.log('deleted product')
       })
       .catch(error => {
         console.log(error)
