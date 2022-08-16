@@ -20,7 +20,7 @@
                     <p>
                         <%= product.description %>
                     </p>
-                    <%- include('../includes/add-to-cart.ejs', {productId: product.id}) %>
+                    <%- include('../includes/add-to-cart.ejs', {productId: product._id}) %>
                 </main>
                 <% } %>
                     <%- include('../includes/end.ejs') %>
