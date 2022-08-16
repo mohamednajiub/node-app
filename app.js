@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const errorController = require('./controllers/error');
 require('dotenv').config()
 
-const mongoConnect = require('./util/database')
+const { mongoConnect } = require('./util/database')
 // const User = require('./models/user');
 
 const app = express();
@@ -14,8 +14,8 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-// const adminRoutes = require('./routes/admin');
-// const shopRoutes = require('./routes/shop');
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,14 +29,15 @@ app.use((req, res, next) => {
     //     .catch(error => {
     //         console.log(error)
     //     });
+    next()
 })
 
-// app.use('/admin', adminRoutes);
-// app.use(shopRoutes);
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect((client) => {
+mongoConnect(() => {
+    console.log('connected')
     app.listen(3000)
-    console.log(client)
 })

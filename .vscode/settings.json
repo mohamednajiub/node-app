@@ -1,6 +1,0 @@
-{
-  "auto-close-tag.enableAutoCloseTag": false,
-  "html.autoClosingTags": false,
-  "javascript.autoClosingTags": false,
-  "prettier.enable": false
-}
