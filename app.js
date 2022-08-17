@@ -8,6 +8,7 @@ require('dotenv').config()
 
 const mongoose = require('mongoose')
 const User = require('./models/user');
+const session = require('express-session')
 
 const app = express();
 
@@ -20,6 +21,12 @@ const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+    secret: 'my secret', // signing the hash which secretly stores our UD in the cookie
+    resave: false, // the session will not be saved on every request that is done, so on every response that is sent but only if some thing changed in the session
+    saveUninitialized: false, // this also ensure that no session gets saved for a request where it doesn't need to be saved nothing was changed about it
+
+}))
 app.use((req, res, next) => {
     User.findById('62fd08118f8f7a02e1f020dd')
         .then(user => {
