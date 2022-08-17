@@ -3,24 +3,14 @@
 
     <body>
         <%- include('../includes/navigation.ejs') %>
-
-            <% if (product) { %>
-
-                <main class="centered">
-                    <h1>
-                        <%= product.title %>
-                    </h1>
-                    <hr>
-                    <div>
-                        <img src="<%= product.imageUrl %>" alt="<%= product.title %>" width="300">
-                    </div>
-                    <h2>
-                        <%= product.price %>
-                    </h2>
-                    <p>
-                        <%= product.description %>
-                    </p>
-                    <%- include('../includes/add-to-cart.ejs', {productId: product._id}) %>
-                </main>
-                <% } %>
-                    <%- include('../includes/end.ejs') %>
+        <main class="centered">
+            <h1><%= product.title %></h1>
+            <hr>
+            <div class="image">
+                <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
+            </div>
+            <h2><%= product.price %></h2>
+            <p><%= product.description %></p>
+            <%- include('../includes/add-to-cart.ejs') %>
+        </main>
+        <%- include('../includes/end.ejs') %>
