@@ -20,17 +20,17 @@ const shopRoutes = require('./routes/shop');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use((req, res, next) => {
-//     User.findUserById('62fbb142a62c1c7cf309ea5b')
-//         .then(user => {
-//             req.user = new User(user.name, user.email, user.cart, user._id)
-//             next()
-//         })
-//         .catch(error => {
-//             console.log(error)
-//         });
+app.use((req, res, next) => {
+    User.findById('62fd08118f8f7a02e1f020dd')
+        .then(user => {
+            req.user = user
+            next()
+        })
+        .catch(error => {
+            console.log(error)
+        });
 
-// })
+})
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
@@ -40,6 +40,21 @@ app.use(errorController.get404);
 mongoose
     .connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`)
     .then(result => {
+        return User.findOne()
+    }).then(user => {
+        if (!user) {
+
+            const user = new User(
+                {
+                    name: 'Mohamed Najiub',
+                    email: 'mohamed.najiub@webkeyz.com',
+                    cart: {
+                        items: []
+                    }
+                }
+            )
+            user.save()
+        }
         app.listen(3000)
     }).catch(error => {
         console.log(error)
