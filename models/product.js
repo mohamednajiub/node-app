@@ -1,101 +1,108 @@
-const { Schema, model } = require('mongoose');
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
 
 const productSchema = new Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    price: {
-        type: Number,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    imageUrl: {
-        type: String,
-        required: true
-    },
-    userId: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        ref: 'User',
-    }
+  title: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  imageUrl: {
+    type: String,
+    required: true
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
 });
 
-module.exports = model('Product', productSchema)
+module.exports = mongoose.model('Product', productSchema);
 
-
-// const { ObjectId } = require('mongodb')
-// const { getDB } = require('../util/database')
+// const mongodb = require('mongodb');
+// const getDb = require('../util/database').getDb;
 
 // class Product {
-
 //   constructor(title, price, description, imageUrl, id, userId) {
 //     this.title = title;
 //     this.price = price;
 //     this.description = description;
 //     this.imageUrl = imageUrl;
-//     this._id = id ? new ObjectId(id) : null;
+//     this._id = id ? new mongodb.ObjectId(id) : null;
 //     this.userId = userId;
 //   }
 
 //   save() {
-//     const db = getDB();
-//     let dpOp;
+//     const db = getDb();
+//     let dbOp;
 //     if (this._id) {
-//       dpOp = db.collection('products')
-//         .updateOne(
-//           { _id: this._id },
-//           { $set: this }
-//         )
+//       // Update the product
+//       dbOp = db
+//         .collection('products')
+//         .updateOne({ _id: this._id }, { $set: this });
 //     } else {
-//       dpOp = db.collection('products')
-//         .insertOne(this)
+//       dbOp = db.collection('products').insertOne(this);
 //     }
-
-//     return dpOp.then((result) => {
-//       return result
-//     }).catch(error => {
-//       console.log(error)
-//     })
+//     return dbOp
+//       .then(result => {
+//         console.log(result);
+//       })
+//       .catch(err => {
+//         console.log(err);
+//       });
 //   }
 
 //   static fetchAll() {
-//     const db = getDB();
-//     return db.collection('products')
+//     const db = getDb();
+//     return db
+//       .collection('products')
 //       .find()
 //       .toArray()
 //       .then(products => {
-//         return products
-//       }).catch(error => {
-//         console.log(error)
+//         console.log(products);
+//         return products;
 //       })
+//       .catch(err => {
+//         console.log(err);
+//       });
 //   }
 
-//   static findById(productId) {
-//     const db = getDB();
-//     return db.collection('products')
-//       .find({ _id: new ObjectId(productId) })
+//   static findById(prodId) {
+//     const db = getDb();
+//     return db
+//       .collection('products')
+//       .find({ _id: new mongodb.ObjectId(prodId) })
 //       .next()
 //       .then(product => {
-//         return product
-//       }).catch(error => {
-//         console.log(error)
+//         console.log(product);
+//         return product;
 //       })
+//       .catch(err => {
+//         console.log(err);
+//       });
 //   }
 
-//   static delete(productId) {
-//     const db = getDB();
-//     return db.collection('products').deleteOne({ _id: new ObjectId(productId) })
+//   static deleteById(prodId) {
+//     const db = getDb();
+//     return db
+//       .collection('products')
+//       .deleteOne({ _id: new mongodb.ObjectId(prodId) })
 //       .then(result => {
+//         console.log('Deleted');
 //       })
-//       .catch(error => {
-//         console.log(error)
-//       })
+//       .catch(err => {
+//         console.log(err);
+//       });
 //   }
 // }
 
-
-// module.exports = Product
+// module.exports = Product;
