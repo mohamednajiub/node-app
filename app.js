@@ -43,7 +43,6 @@ mongoose
         return User.findOne()
     }).then(user => {
         if (!user) {
-
             const user = new User(
                 {
                     name: 'Mohamed Najiub',
