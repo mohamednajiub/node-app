@@ -27,3 +27,43 @@ exports.postLogout = (req, res, next) => {
     res.redirect('/');
   });
 };
+
+exports.getSignup = (req, res, next) => {
+  res.render('auth/signup', {
+    path: '/signup',
+    pageTitle: 'Signup',
+    isAuthenticated: false
+  });
+};
+
+exports.postSignup = (req, res, next) => {
+  const name = req.body.name;
+  const email = req.body.email;
+  const password = req.body.password;
+  const passwordConfirmation = req.body.passwordConfirmation;
+
+  User.findOne({ email: email })
+    .then(user => {
+      if (user) {
+        return res.redirect('/signup')
+      } else {
+        if (password !== passwordConfirmation) {
+          return res.redirect('/signup')
+        } else {
+          const user = new User({
+            name,
+            email,
+            password,
+            cart: { items: [] }
+          })
+          return user.save()
+        }
+      }
+    })
+    .then(result => {
+      res.redirect('/login')
+    })
+    .catch(error => {
+      console.log(error)
+    })
+};
