@@ -10,14 +10,33 @@ exports.getLogin = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  User.findById('62fd08118f8f7a02e1f020dd')
+  const email = req.body.email;
+  const password = req.body.password;
+  User.findOne({ email: email })
     .then(user => {
-      req.session.isLoggedIn = true;
-      req.session.user = user;
-      req.session.save(err => {
-        console.log(err);
-        res.redirect('/');
-      });
+      if (!user) {
+        return res.redirect('/login');
+      }
+
+      bcrypt.compare(password, user.password)
+        .then(result => {
+          if (result) {
+            req.session.isLoggedIn = true;
+            req.session.user = user;
+            return req.session.save(err => {
+              console.log("🚀 ~ file: auth.js ~ line 27 ~ err", err)
+              res.redirect('/');
+            });
+          }
+          return res.redirect('/login')
+
+        })
+        .catch(error => {
+          console.log("🚀 ~ file: auth.js ~ line 36 ~ error", error)
+
+          return res.redirect('/login');
+        })
+
     })
     .catch(err => console.log(err));
 };
