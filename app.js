@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const errorController = require('./controllers/error');
 
@@ -41,6 +42,8 @@ app.use(
     })
 );
 app.use(csrfProtection)
+
+app.use(flash())
 
 app.use((req, res, next) => {
     if (!req.session.user) {
