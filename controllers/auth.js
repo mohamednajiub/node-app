@@ -1,11 +1,33 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
+const nodemailer = require('nodemailer');
+const sgTransport = require('nodemailer-sendgrid-transport');
+
+
+// username + password
+var options = {
+  auth: {
+    api_key: process.env.SEND_GRID_API_KEY
+  }
+}
+
+var mailer = nodemailer.createTransport(sgTransport(options));
+
+
 exports.getLogin = (req, res, next) => {
+  let message = req.flash('error');
+
+  if (message.length > 0) {
+    message = message[0]
+  } else {
+    message = null
+  }
+
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    errorMessage: req.flash('error')
+    errorMessage: message
   });
 };
 
@@ -29,6 +51,7 @@ exports.postLogin = (req, res, next) => {
               res.redirect('/');
             });
           }
+          req.flash('error', 'Invalid email or password.')
           return res.redirect('/login')
 
         })
@@ -50,9 +73,17 @@ exports.postLogout = (req, res, next) => {
 };
 
 exports.getSignup = (req, res, next) => {
+  let message = req.flash('error');
+
+  if (message.length > 0) {
+    message = message[0]
+  } else {
+    message = null
+  }
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
+    errorMessage: message
   });
 };
 
@@ -65,9 +96,11 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ email: email })
     .then(user => {
       if (user) {
+        req.flash('error', 'E-mail exists already. please check it and try again.')
         return res.redirect('/signup')
       } else {
         if (password !== passwordConfirmation) {
+          req.flash('error', 'Password & password Confirmation doesn\'t match please check them and try again.')
           return res.redirect('/signup')
         } else {
           return bcrypt.hash(password, 12)
@@ -80,7 +113,19 @@ exports.postSignup = (req, res, next) => {
               })
               return user.save()
             }).then(result => {
+              return mailer.sendMail({
+                to: email,
+                from: 'mohamed.najiub@webkeyz.com',
+                subject: 'Signup completed',
+                html: `
+                  <h1>You Successfully signed up!</h1>
+                `
+              })
+            }).then(emailSent => {
+
               res.redirect('/login')
+            }).catch(error => {
+              console.log(error)
             })
         }
       }
