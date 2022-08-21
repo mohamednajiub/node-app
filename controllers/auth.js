@@ -172,7 +172,7 @@ exports.postReset = (req, res, next) => {
           req.flash('error', 'No Account with that email found.')
           return res.redirect('/reset')
         }
-        user.userToken = token
+        user.resetToken = token;
         user.resetTokenExpiration = Date.now() + 3600000;
 
         return user.save()
@@ -185,7 +185,7 @@ exports.postReset = (req, res, next) => {
           subject: 'Password Reset',
           html: `
             <p>You requested a password reset!</p>
-            <p>Click this <a href="${req.protocol}://${req.headers.host}/reset/${token}">link</a> to set a new password</p>
+            <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password</p>
             <p>Please note that this link will be valid for only 1 hour</p>
           `
         })
@@ -194,3 +194,109 @@ exports.postReset = (req, res, next) => {
       })
   })
 };
+
+
+exports.getResetPassword = (req, res, next) => {
+
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+
+  const token = req.params.token;
+  User.findOne({
+    resetToken: token,
+    resetTokenExpiration: {
+      $gt: Date.now()
+    }
+  }).then(user => {
+    if (user) {
+      res.render('auth/new-password', {
+        path: '/new-password',
+        pageTitle: 'New Password',
+        errorMessage: message,
+        userId: user._id.toString(),
+        passwordToken: token
+      });
+    } else {
+      req.flash('error', 'Your Reset password token had been expired.')
+      res.render('auth/reset', {
+        path: '/reset',
+        pageTitle: 'Reset Password',
+        errorMessage: message
+      });
+    }
+  }).catch(error => {
+    console.log(error)
+  })
+
+
+}
+
+exports.postResetPassword = (req, res, next) => {
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+
+  const token = req.body.passwordToken;
+  const newPassword = req.body.password
+  const newPasswordConfirmation = req.body.passwordConfirmation
+  const userId = req.body.userId
+  let resetUser;
+
+  if (newPassword !== newPasswordConfirmation) {
+    console.log('passwords doesn\'t match')
+    req.flash('error', 'Password and password confirmation are not matched.')
+    return res.redirect(`/reset/${token}`)
+
+  }
+
+  User.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+    _id: userId
+  }).then(user => {
+    resetUser = user;
+    return bcrypt.hash(newPassword, 12)
+  }).then(hashedPassword => {
+    resetUser.password = hashedPassword;
+    resetUser.resetToken = undefined;
+    resetUser.resetTokenExpiration = undefined;
+    return resetUser.save()
+  }).then(result => {
+    res.redirect('/login')
+  }).catch(error => {
+    console.log(error)
+  })
+  // User.findOne({
+  //   resetToken: token,
+  //   resetTokenExpiration: {
+  //     $gt: Date.now()
+  //   }
+  // }).then(user => {
+  //   if (user) {
+  //     res.render('auth/new-password', {
+  //       path: '/new-password',
+  //       pageTitle: 'New Password',
+  //       errorMessage: message,
+  //       userId: user._id.toString()
+  //     });
+  //   } else {
+  //     req.flash('error', 'Your Reset password token had been expired.')
+  //     res.render('auth/reset', {
+  //       path: '/reset',
+  //       pageTitle: 'Reset Password',
+  //       errorMessage: message
+  //     });
+  //   }
+  // }).catch(error => {
+  //   console.log(error)
+  // })
+
+
+}
