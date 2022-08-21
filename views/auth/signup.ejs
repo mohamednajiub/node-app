@@ -15,19 +15,23 @@
                         <form class="login-form" action="/signup" method="POST" novalidate>
                             <div class="form-control">
                                 <label for="name">Name</label>
-                                <input type="text" name="name" id="name">
+                                <input type="text" name="name" id="name"
+                                    value="<% if (oldInput && oldInput.name) { %><%=oldInput.name%><% } %>">
                             </div>
                             <div class="form-control">
                                 <label for="email">E-Mail</label>
-                                <input type="email" name="email" id="email">
+                                <input type="email" name="email" id="email"
+                                    value="<% if (oldInput && oldInput.email) { %><%= oldInput.email%><% } %>">
                             </div>
                             <div class="form-control">
                                 <label for="password">Password</label>
-                                <input type="password" name="password" id="password">
+                                <input type="password" name="password" id="password"
+                                    value="<% if (oldInput && oldInput.password) { %><%= oldInput.password%><% } %>">
                             </div>
                             <div class="form-control">
                                 <label for="passwordConfirmation">Confirm Password</label>
-                                <input type="password" name="passwordConfirmation" id="passwordConfirmation">
+                                <input type="password" name="passwordConfirmation" id="passwordConfirmation"
+                                    value="<% if (oldInput && oldInput.passwordConfirmation) { %><%= oldInput.passwordConfirmation%><% } %>">
                             </div>
                             <input type="hidden" name="_csrf" value="<%= csrfToken%>">
                             <button class="btn" type="submit">Signup</button>
