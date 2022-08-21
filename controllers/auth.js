@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
@@ -148,4 +149,48 @@ exports.getReset = (req, res, next) => {
     pageTitle: 'Reset Password',
     errorMessage: message
   });
+};
+
+exports.postReset = (req, res, next) => {
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+  crypto.randomBytes(32, (error, buffer) => {
+    if (error) {
+      console.log(error);
+      return res.redirect('/reset')
+    }
+
+    const token = buffer.toString('hex')
+
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash('error', 'No Account with that email found.')
+          return res.redirect('/reset')
+        }
+        user.userToken = token
+        user.resetTokenExpiration = Date.now() + 3600000;
+
+        return user.save()
+
+      }).then((result) => {
+        res.redirect('/')
+        mailer.sendMail({
+          to: req.body.email,
+          from: 'mohamed.najiub@webkeyz.com',
+          subject: 'Password Reset',
+          html: `
+            <p>You requested a password reset!</p>
+            <p>Click this <a href="${req.protocol}://${req.headers.host}/reset/${token}">link</a> to set a new password</p>
+            <p>Please note that this link will be valid for only 1 hour</p>
+          `
+        })
+      }).catch(error => {
+        console.log(error)
+      })
+  })
 };
