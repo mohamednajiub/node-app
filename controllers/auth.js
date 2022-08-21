@@ -5,6 +5,8 @@ const User = require('../models/user');
 const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid-transport');
 
+const { validationResult } = require('express-validator')
+
 
 // username + password
 var options = {
@@ -35,6 +37,17 @@ exports.getLogin = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.render('auth/login', {
+      path: '/login',
+      pageTitle: 'Login',
+      errorMessage: errors.array()[0].msg
+    });
+  }
+
   User.findOne({ email: email })
     .then(user => {
       if (!user) {
@@ -94,45 +107,38 @@ exports.postSignup = (req, res, next) => {
   const password = req.body.password;
   const passwordConfirmation = req.body.passwordConfirmation;
 
-  User.findOne({ email: email })
-    .then(user => {
-      if (user) {
-        req.flash('error', 'E-mail exists already. please check it and try again.')
-        return res.redirect('/signup')
-      } else {
-        if (password !== passwordConfirmation) {
-          req.flash('error', 'Password & password Confirmation doesn\'t match please check them and try again.')
-          return res.redirect('/signup')
-        } else {
-          return bcrypt.hash(password, 12)
-            .then(hashedPassword => {
-              const user = new User({
-                name,
-                email,
-                password: hashedPassword,
-                cart: { items: [] }
-              })
-              return user.save()
-            }).then(result => {
-              return mailer.sendMail({
-                to: email,
-                from: 'mohamed.najiub@webkeyz.com',
-                subject: 'Signup completed',
-                html: `
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    console.log(errors)
+    return res.status(422).render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      errorMessage: errors.array()[0].msg
+    })
+  }
+
+
+  bcrypt.hash(password, 12)
+    .then(hashedPassword => {
+      const user = new User({
+        name,
+        email,
+        password: hashedPassword,
+        cart: { items: [] }
+      })
+      return user.save()
+    }).then(result => {
+      res.redirect('/login')
+      return mailer.sendMail({
+        to: email,
+        from: 'mohamed.najiub@webkeyz.com',
+        subject: 'Signup completed',
+        html: `
                   <h1>You Successfully signed up!</h1>
                 `
-              })
-            }).then(emailSent => {
-
-              res.redirect('/login')
-            }).catch(error => {
-              console.log(error)
-            })
-        }
-      }
-    })
-
-    .catch(error => {
+      })
+    }).catch(error => {
       console.log(error)
     })
 };
@@ -231,8 +237,6 @@ exports.getResetPassword = (req, res, next) => {
   }).catch(error => {
     console.log(error)
   })
-
-
 }
 
 exports.postResetPassword = (req, res, next) => {
@@ -273,30 +277,4 @@ exports.postResetPassword = (req, res, next) => {
   }).catch(error => {
     console.log(error)
   })
-  // User.findOne({
-  //   resetToken: token,
-  //   resetTokenExpiration: {
-  //     $gt: Date.now()
-  //   }
-  // }).then(user => {
-  //   if (user) {
-  //     res.render('auth/new-password', {
-  //       path: '/new-password',
-  //       pageTitle: 'New Password',
-  //       errorMessage: message,
-  //       userId: user._id.toString()
-  //     });
-  //   } else {
-  //     req.flash('error', 'Your Reset password token had been expired.')
-  //     res.render('auth/reset', {
-  //       path: '/reset',
-  //       pageTitle: 'Reset Password',
-  //       errorMessage: message
-  //     });
-  //   }
-  // }).catch(error => {
-  //   console.log(error)
-  // })
-
-
 }
