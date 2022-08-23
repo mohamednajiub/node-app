@@ -2,7 +2,7 @@
     <ul>
         <% for(let i=1; i<=paginationData.lastPage; i++){ %>
             <li>
-                <a href="/?page=<%=i%>" class="<% if (paginationData.currentPage === i) { %>active<% } %>">
+                <a href="?page=<%=i%>" class="<% if (paginationData.currentPage === i) { %>active<% } %>">
                     <%=i%>
                 </a>
             </li>
