@@ -3,10 +3,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  name: {
-    type: String,
-    required: true
-  },
   email: {
     type: String,
     required: true
@@ -28,7 +24,7 @@ const userSchema = new Schema({
         quantity: { type: Number, required: true }
       }
     ]
-  },
+  }
 });
 
 userSchema.methods.addToCart = function (product) {
