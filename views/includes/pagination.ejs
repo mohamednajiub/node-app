@@ -1,9 +1,11 @@
 <div class="pagination">
     <ul>
-        <li><a href="/?page=1">1</a></li>
-        <li><a href="/?page=2">2</a></li>
-        <li><a href="/?page=3">3</a></li>
-        <li><a href="/?page=4">4</a></li>
-        <li><a href="/?page=5">5</a></li>
+        <% for(let i=1; i<=paginationData.lastPage; i++){ %>
+            <li>
+                <a href="/?page=<%=i%>" class="<% if (paginationData.currentPage === i) { %>active<% } %>">
+                    <%=i%>
+                </a>
+            </li>
+            <%} %>
     </ul>
 </div>

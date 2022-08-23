@@ -4,14 +4,33 @@ const path = require('path');
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 
+const ITEMS_PER_PAGE = 1;
 
 exports.getProducts = (req, res, next) => {
+  const page = +req.query.page || 1;
+  let totalItems;
+
   Product.find()
+    .countDocuments()
+    .then(numberOfProducts => {
+      totalItems = numberOfProducts
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+    })
     .then(products => {
       res.render('shop/product-list', {
         prods: products,
         pageTitle: 'All Products',
-        path: '/products'
+        path: '/products',
+        paginationData: {
+          currentPage: page,
+          hasNextPage: (ITEMS_PER_PAGE * page) < totalItems,
+          hasPreviousPage: page > 1,
+          nextPage: page + 1,
+          previousPage: page - 1,
+          lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+        }
       });
     })
     .catch(err => {
@@ -39,12 +58,32 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
+  const page = +req.query.page || 1;
+  let totalItems;
+
   Product.find()
+    .countDocuments()
+    .then(numberOfProducts => {
+      totalItems = numberOfProducts
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+
+    })
+
     .then(products => {
       res.render('shop/index', {
         prods: products,
         pageTitle: 'Shop',
-        path: '/'
+        path: '/',
+        paginationData: {
+          currentPage: page,
+          hasNextPage: (ITEMS_PER_PAGE * page) < totalItems,
+          hasPreviousPage: page > 1,
+          nextPage: page + 1,
+          previousPage: page - 1,
+          lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+        }
       });
     })
     .catch(err => {
@@ -181,21 +220,6 @@ exports.getInvoice = (req, res, next) => {
           pdfDoc.fontSize(16).text(`total: ${product.product.price} * ${product.quantity} = ${product.product.price * product.quantity}`)
         })
         pdfDoc.end()
-        // fs.readFile(invoicePath, (error, data) => {
-        //   if (error) {
-        //     next(error)
-        //   }
-
-        //   res.set({
-        //     'Content-Type': 'application/pdf',
-        //     'Content-Disposition': `inline; filename="${invoiceName}"`
-        //   });
-        //   res.send(data)
-        // })
-
-        // const file = fs.createReadStream(invoicePath);
-
-        // file.pipe(res);
 
       } else {
         return next(new Error('Un-Authorized'))
