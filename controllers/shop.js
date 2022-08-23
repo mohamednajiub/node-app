@@ -159,17 +159,25 @@ exports.getInvoice = (req, res, next) => {
         const invoiceName = `invoice-${orderId}.pdf`
         const invoicePath = path.join('data', 'invoices', invoiceName)
 
-        fs.readFile(invoicePath, (error, data) => {
-          if (error) {
-            next(error)
-          }
+        // fs.readFile(invoicePath, (error, data) => {
+        //   if (error) {
+        //     next(error)
+        //   }
 
-          res.set({
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `inline; filename="${invoiceName}"`
-          });
-          res.send(data)
-        })
+        //   res.set({
+        //     'Content-Type': 'application/pdf',
+        //     'Content-Disposition': `inline; filename="${invoiceName}"`
+        //   });
+        //   res.send(data)
+        // })
+
+        const file = fs.createReadStream(invoicePath);
+        res.set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `inline; filename="${invoiceName}"`
+        });
+        file.pipe(res);
+
       } else {
         return next(new Error('Un-Authorized'))
       }
